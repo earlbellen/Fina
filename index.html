@@ -232,6 +232,9 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   .mod-btn .mod-label{display:none}
   .mod-btn .mod-ico{font-size:1.5rem;line-height:1;display:block}
   .mod-btn .mbl{display:none}
+  /* Show label only on active tab */
+  .mod-btn.active .mod-label{display:block;font-size:.6rem;font-weight:700;line-height:1.2;margin-top:.15rem;white-space:nowrap}
+  .mod-btn.active .mod-ico{font-size:1.2rem}
   /* Bigger touch targets for action buttons on mobile */
   .btn.bxs{min-height:38px;min-width:38px}
   .mod-btn:hover{background:var(--g50)}
@@ -246,6 +249,12 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   .mod-btn.active.mod-savings{border-top-color:#d97706;color:#d97706}
   .mod-btn.active.mod-expenses{border-top-color:var(--orange2);color:var(--orange2)}
   .mod-btn.active.mod-nw{border-top-color:var(--blue2);color:var(--blue2)}
+  /* Sub-nav + debt nav-btn: icon only when inactive, show label when active */
+  .sub-nav-btn .snav-lbl,.nav-btn .snav-lbl{display:none}
+  .sub-nav-btn.active .snav-lbl,.nav-btn.active .snav-lbl{display:inline}
+  /* Budget table: hide account column on mobile */
+  .bm-acct-col{display:none}
+  .bm-acct-mob{display:block;font-size:.68rem;color:var(--g400);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
 
   /* ── Phase 2: Header ─────────────────────────────────── */
   .hdr{height:50px;padding:0 .9rem}
@@ -578,6 +587,8 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .bpbar-fill{height:100%;border-radius:2px;transition:width .4s ease}
 .bactual{font-size:.85rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .bactual-cell{min-width:110px;text-align:right}
+.bm-acct-mob{display:none} /* shown only on mobile via media query */
+.snav-lbl{} /* always visible on desktop; hidden on mobile for inactive */
 .bmonth-tbl th.nr-act{text-align:right;min-width:110px}
 .bamount::-webkit-outer-spin-button,.bamount::-webkit-inner-spin-button{-webkit-appearance:none}
 .bamount:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(45,106,191,.1)}
@@ -678,6 +689,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   </div>
   <div class="hdr-actions">
     <span id="fsa-hdr-status"></span>
+    <button class="hdr-settings-btn" onclick="location.reload()" title="Refresh" aria-label="Refresh">🔄</button>
     <button class="hdr-settings-btn" onclick="showModule('settings',this)" title="Settings" aria-label="Settings">⚙️</button>
     <input type="file" id="import-backup-file" accept=".json" style="display:none" onchange="importBackup(event)">
   </div>
@@ -694,9 +706,9 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 
 <!-- DEBT SUB-NAV -->
 <nav class="nav" id="debt-subnav" style="display:none">
-  <button class="nav-btn active" onclick="showTab('setup',this)">⚙️ Setup</button>
-  <button class="nav-btn" onclick="showTab('plan',this)">📋 Payoff Plan</button>
-  <button class="nav-btn" onclick="showTab('tracker',this)">✅ Payment Tracker</button>
+  <button class="nav-btn active" onclick="showTab('setup',this)"><span class="snav-ico">⚙️</span><span class="snav-lbl"> Setup</span></button>
+  <button class="nav-btn" onclick="showTab('plan',this)"><span class="snav-ico">📋</span><span class="snav-lbl"> Payoff Plan</span></button>
+  <button class="nav-btn" onclick="showTab('tracker',this)"><span class="snav-ico">✅</span><span class="snav-lbl"> Payment Tracker</span></button>
   <button class="nav-btn" onclick="showTab('charts',this)">📊 Charts</button>
 </nav>
 
@@ -990,6 +1002,26 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
     </div>
   </div>
 
+  <!-- Categories -->
+  <div class="card" style="margin-bottom:1.25rem">
+    <div class="card-hdr"><span class="card-title">🏷️ Manage Categories</span></div>
+    <div id="settings-cats-body">
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem" id="cats-tab-bar">
+        <button class="btn bsm bp" id="ctab-expense"   onclick="_setCatsTab('expense',this)">💸 Expense</button>
+        <button class="btn bsm bg" id="ctab-income"    onclick="_setCatsTab('income',this)">💚 Income</button>
+        <button class="btn bsm bg" id="ctab-savings"   onclick="_setCatsTab('savings',this)">💙 Savings</button>
+        <button class="btn bsm bg" id="ctab-asset"     onclick="_setCatsTab('asset',this)">🏦 Assets</button>
+        <button class="btn bsm bg" id="ctab-liability" onclick="_setCatsTab('liability',this)">💳 Liabilities</button>
+      </div>
+      <div id="cats-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--g200);border-radius:var(--rs);padding:.25rem .5rem;margin-bottom:.6rem"></div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input type="text" id="cats-new-input" placeholder="New category name…" style="flex:1;padding:.4rem .65rem;border:1.5px solid var(--g200);border-radius:var(--rs);font-size:.875rem"
+          onkeydown="if(event.key==='Enter')_addCat()">
+        <button class="btn bp bsm" onclick="_addCat()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Danger zone -->
   <div class="card">
     <div class="card-hdr"><span class="card-title">⚠️ Danger Zone</span></div>
@@ -1004,10 +1036,10 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 <div class="tab" id="tab-budget">
   <!-- Budget sub-nav -->
   <nav class="sub-nav">
-    <button class="sub-nav-btn" onclick="showBudgetPage('subscriptions',this)">🔄 Subscriptions</button>
-    <button class="sub-nav-btn active" id="budp-btn-monthly" onclick="showBudgetPage('monthly',this)">📅 Monthly Budget</button>
-    <button class="sub-nav-btn" onclick="showBudgetPage('annual',this)">📊 Annual View</button>
-    <button class="sub-nav-btn" onclick="showBudgetPage('dashboard',this)">📈 Dashboard</button>
+    <button class="sub-nav-btn" onclick="showBudgetPage('subscriptions',this)"><span class="snav-ico">🔄</span><span class="snav-lbl"> Subscriptions</span></button>
+    <button class="sub-nav-btn active" id="budp-btn-monthly" onclick="showBudgetPage('monthly',this)"><span class="snav-ico">📅</span><span class="snav-lbl"> Monthly Budget</span></button>
+    <button class="sub-nav-btn" onclick="showBudgetPage('annual',this)"><span class="snav-ico">📊</span><span class="snav-lbl"> Annual View</span></button>
+    <button class="sub-nav-btn" onclick="showBudgetPage('dashboard',this)"><span class="snav-ico">📈</span><span class="snav-lbl"> Dashboard</span></button>
   </nav>
 
   <!-- Accounts sub-page -->
@@ -1083,9 +1115,9 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 <div class="tab" id="tab-networth">
   <!-- Net Worth sub-nav -->
   <nav class="sub-nav">
-    <button class="sub-nav-btn active" onclick="showNwPage('monthly',this)">📅 Monthly Snapshot</button>
-    <button class="sub-nav-btn" onclick="showNwPage('annual',this)">📊 Annual View</button>
-    <button class="sub-nav-btn" onclick="showNwPage('dashboard',this)">📈 Dashboard</button>
+    <button class="sub-nav-btn active" onclick="showNwPage('monthly',this)"><span class="snav-ico">📅</span><span class="snav-lbl"> Monthly Snapshot</span></button>
+    <button class="sub-nav-btn" onclick="showNwPage('annual',this)"><span class="snav-ico">📊</span><span class="snav-lbl"> Annual View</span></button>
+    <button class="sub-nav-btn" onclick="showNwPage('dashboard',this)"><span class="snav-ico">📈</span><span class="snav-lbl"> Dashboard</span></button>
   </nav>
 
   <!-- Monthly Snapshot sub-page -->
@@ -1141,8 +1173,8 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 <!-- ==================== EXPENSES MODULE ==================== -->
 <div class="tab" id="tab-expenses">
   <div class="sub-nav">
-    <button class="sub-nav-btn active" onclick="showExpPage('monthly',this)">📅 Monthly Logs</button>
-    <button class="sub-nav-btn" onclick="showExpPage('dashboard',this)">📈 Dashboard</button>
+    <button class="sub-nav-btn active" onclick="showExpPage('monthly',this)"><span class="snav-ico">📅</span><span class="snav-lbl"> Monthly Logs</span></button>
+    <button class="sub-nav-btn" onclick="showExpPage('dashboard',this)"><span class="snav-ico">📈</span><span class="snav-lbl"> Dashboard</span></button>
   </div>
   <div class="sub-page active" id="expp-monthly">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem">
@@ -1181,11 +1213,11 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 <!-- ===================== SAVINGS TAB ===================== -->
 <div class="tab" id="tab-savings">
   <nav class="sub-nav">
-    <button class="sub-nav-btn" onclick="showSavingsPage('accounts',this)">🏦 Accounts</button>
-    <button class="sub-nav-btn active" onclick="showSavingsPage('funds',this)">🎯 Funds &amp; Goals</button>
-    <button class="sub-nav-btn" onclick="showSavingsPage('plan',this)">📋 Payment Plan</button>
-    <button class="sub-nav-btn" onclick="showSavingsPage('tracker',this)">✅ Tracker</button>
-    <button class="sub-nav-btn" onclick="showSavingsPage('dashboard',this)">📈 Dashboard</button>
+    <button class="sub-nav-btn" onclick="showSavingsPage('accounts',this)"><span class="snav-ico">🏦</span><span class="snav-lbl"> Accounts</span></button>
+    <button class="sub-nav-btn active" onclick="showSavingsPage('funds',this)"><span class="snav-ico">🎯</span><span class="snav-lbl"> Funds &amp; Goals</span></button>
+    <button class="sub-nav-btn" onclick="showSavingsPage('plan',this)"><span class="snav-ico">📋</span><span class="snav-lbl"> Payment Plan</span></button>
+    <button class="sub-nav-btn" onclick="showSavingsPage('tracker',this)"><span class="snav-ico">✅</span><span class="snav-lbl"> Tracker</span></button>
+    <button class="sub-nav-btn" onclick="showSavingsPage('dashboard',this)"><span class="snav-ico">📈</span><span class="snav-lbl"> Dashboard</span></button>
   </nav>
   <div class="sub-page" id="savp-accounts">
     <div class="ptitle" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
@@ -1641,6 +1673,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
         <option value="income">💚 Income</option>
         <option value="savings">💙 Savings &amp; Investments</option>
         <option value="expense">🔴 Expense</option>
+        <option value="sinking">🏦 Sinking Fund</option>
       </select>
     </div>
     <div class="fg">
@@ -1658,6 +1691,24 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
     <div class="modal-footer">
       <button class="btn bg" onclick="closeBrowModal()">Cancel</button>
       <button class="btn bp" onclick="saveBrow()">Add Row</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SINKING FUND ADD PICKER ===================== -->
+<div class="modal-overlay" id="sink-add-modal">
+  <div class="modal" style="max-width:420px">
+    <h3>🏦 Add to Sinking Funds</h3>
+    <p style="font-size:.875rem;color:var(--g500);margin-bottom:1.1rem">Link an existing sinking fund goal, or create a standalone budget row.</p>
+    <div class="fg">
+      <label style="font-weight:600;margin-bottom:.35rem;display:block">Link existing sinking fund</label>
+      <select id="sink-fund-picker" style="width:100%;margin-bottom:.5rem"><option value="">— Choose fund —</option></select>
+      <button class="btn bp" onclick="addSinkFundLink()" style="width:100%">Add Linked Fund to Budget</button>
+    </div>
+    <div style="text-align:center;color:var(--g400);font-size:.8rem;margin:.85rem 0">— or —</div>
+    <button class="btn bg" onclick="closeSinkAddModal();openAddBudgetRow('sinking')" style="width:100%;padding:.65rem">📝 Create Independent Row</button>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="closeSinkAddModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -2013,6 +2064,7 @@ let state = {
     lockedMonths: {},
     savingsPlanActive: {},
     subActive: {},
+    sinkFundLinks: [],    // fund IDs explicitly added to budget (shown regardless of date range)
   },
   // ── Savings ──────────────────────────────────────────────
   savings: {
@@ -2044,7 +2096,7 @@ function load() {
       const p = JSON.parse(raw);
       state = { ...state, ...p };
       // Deep-merge nested objects so new sub-keys always exist
-      state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, ...(p.budget || {}) };
+      state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, sinkFundLinks:[], catConfig:{}, ...(p.budget || {}) };
       state.budget.rows = (state.budget.rows||[]).filter(r => !r.isDefault);
       state.savings  = { funds:[], history:{}, ...(p.savings || {}) };
       if (!state.expenses) state.expenses = [];
@@ -3399,7 +3451,7 @@ async function exportBackup() {
 
 function _applyBackup(data) {
   state = { ...state, ...data };
-  state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, ...(data.budget||{}) };
+  state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, sinkFundLinks:[], catConfig:{}, ...(data.budget||{}) };
   state.budget.rows = (state.budget.rows||[]).filter(r => !r.isDefault);
   state.savings  = { funds:[], history:{}, ...(data.savings||{}) };
   if (!state.expenses) state.expenses = [];
@@ -3831,6 +3883,13 @@ const EXPENSE_CATS   = [
 const ASSET_CATS     = ['Cash & Bank Accounts','E-Wallets & Digital Cash','Stock Investments','Mutual Funds / UITF','Crypto / Digital Assets','Real Estate (Land, Condo, House)','Vehicles','Personal Property & Jewelry','Business Equity','Retirement Accounts','Receivables / Loans Given','Other Assets'];
 const LIABILITY_CATS = ['Credit Cards','Personal Loans','Housing / Mortgage','Car Loans','E-Wallet Loans (GLoan, Maya)','Student Loans','Business Loans','Medical Bills','Tax Obligations','Informal / Family Debts','Other Debts'];
 
+function _getCats(type) {
+  const BASE = { income:INCOME_CATS, savings:SAVINGS_CATS, savings_payment:SAVINGS_CATS, asset:ASSET_CATS, liability:LIABILITY_CATS };
+  const base = BASE[type] || EXPENSE_CATS;
+  const cfg  = ((state.budget&&state.budget.catConfig)||{})[type] || {};
+  const hidden = new Set(cfg.hidden||[]);
+  return [...base.filter(c=>!hidden.has(c)), ...(cfg.custom||[])];
+}
 function toMonthly(amt, freq) {
   const m = {monthly:1,'semi-monthly':2,'bi-weekly':26/12,weekly:52/12,quarterly:1/3,'semi-annual':1/6,annual:1/12};
   return (amt||0) * (m[freq] ?? 1);
@@ -3970,7 +4029,7 @@ function deleteAcct(id) {
 // ============================================================
 function populateBitemCats() {
   const sec  = document.getElementById('bitem-section').value;
-  const cats = sec==='income' ? INCOME_CATS : sec==='savings' ? SAVINGS_CATS : EXPENSE_CATS;
+  const cats = _getCats(sec);
   const cur  = document.getElementById('bitem-cat').value;
   document.getElementById('bitem-cat').innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
   if (cats.includes(cur)) document.getElementById('bitem-cat').value = cur;
@@ -4119,8 +4178,9 @@ function openAssetModal(id) {
   document.getElementById('asset-mid').value   = id || '';
   document.getElementById('asset-name').value  = a ? a.name : '';
   const catSel = document.getElementById('asset-cat');
-  catSel.innerHTML = ASSET_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
-  catSel.value = a ? (a.category||ASSET_CATS[0]) : ASSET_CATS[0];
+  const _aCats = _getCats('asset');
+  catSel.innerHTML = _aCats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  catSel.value = a ? (a.category||_aCats[0]) : _aCats[0];
   document.getElementById('asset-value').value = a ? (a.value||'') : '';
   _populateAcctDropdown('asset-account', a ? (a.accountId||'') : '');
   document.getElementById('asset-notes').value = a ? (a.notes||'') : '';
@@ -4159,8 +4219,9 @@ function openNwliabModal(id) {
   document.getElementById('nwliab-mid').value   = id || '';
   document.getElementById('nwliab-name').value  = l ? l.name : '';
   const catSel = document.getElementById('nwliab-cat');
-  catSel.innerHTML = LIABILITY_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
-  catSel.value = l ? (l.category||LIABILITY_CATS[0]) : LIABILITY_CATS[0];
+  const _lCats = _getCats('liability');
+  catSel.innerHTML = _lCats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  catSel.value = l ? (l.category||_lCats[0]) : _lCats[0];
   document.getElementById('nwliab-value').value = l ? (l.value||'') : '';
   document.getElementById('nwliab-notes').value = l ? (l.notes||'') : '';
   document.getElementById('nwliab-modal').classList.add('open');
@@ -4374,7 +4435,7 @@ const _SUB_CAT_LEGACY = {
 };
 
 function _populateBrowCats(section, selectedVal) {
-  const cats = section==='income' ? INCOME_CATS : section==='savings' ? SAVINGS_CATS : EXPENSE_CATS;
+  const cats = _getCats(section);
   const sel = document.getElementById('brow-category');
   if (!sel) return;
   const extra = selectedVal && !cats.includes(selectedVal) ? `<option value="${selectedVal}" selected>${selectedVal}</option>` : '';
@@ -4385,8 +4446,9 @@ function _populateSubCats(selectedVal) {
   const sel = document.getElementById('sub-category');
   if (!sel) return;
   const mapped = _SUB_CAT_LEGACY[selectedVal] || selectedVal || 'Other Expenses';
-  const extra = mapped && !EXPENSE_CATS.includes(mapped) ? `<option value="${mapped}" selected>${mapped}</option>` : '';
-  sel.innerHTML = extra + EXPENSE_CATS.map(c=>`<option value="${c}"${c===mapped?' selected':''}>${c}</option>`).join('');
+  const _eCats = _getCats('expense');
+  const extra = mapped && !_eCats.includes(mapped) ? `<option value="${mapped}" selected>${mapped}</option>` : '';
+  sel.innerHTML = extra + _eCats.map(c=>`<option value="${c}"${c===mapped?' selected':''}>${c}</option>`).join('');
 }
 
 function addBudgetRow() {
@@ -4406,6 +4468,35 @@ function openAddBudgetRow(section) {
   setTimeout(() => document.getElementById('brow-name').focus(), 50);
 }
 function closeBrowModal() { document.getElementById('brow-modal').classList.remove('open'); }
+function openSinkAddModal() {
+  const sel = document.getElementById('sink-fund-picker');
+  const sinkFunds = (state.savings.funds||[]).filter(f=>(f.type||'sinking')==='sinking');
+  sel.innerHTML = '<option value="">— Choose fund —</option>' +
+    sinkFunds.map(f=>`<option value="${f.id}">${esc(f.name)}${f.monthly>0?' — '+fmt(f.monthly)+'/mo':' (no monthly set)'}</option>`).join('');
+  document.getElementById('sink-add-modal').classList.add('open');
+}
+function closeSinkAddModal() { document.getElementById('sink-add-modal').classList.remove('open'); }
+function addSinkFundLink() {
+  const fundId = document.getElementById('sink-fund-picker').value;
+  if (!fundId) { alert('Please select a sinking fund.'); return; }
+  const f = (state.savings.funds||[]).find(x=>x.id===fundId);
+  if (!f) return;
+  if (!f.monthly || f.monthly <= 0) {
+    alert(`"${f.name}" has no monthly contribution set.\nEdit the fund in Savings to set a monthly amount first.`);
+    return;
+  }
+  if (!state.budget.sinkFundLinks) state.budget.sinkFundLinks = [];
+  if (!state.budget.sinkFundLinks.includes(fundId)) state.budget.sinkFundLinks.push(fundId);
+  closeSinkAddModal();
+  save();
+  renderBudgetMonthly();
+}
+function removeSinkFundLink(fundId) {
+  if (!state.budget.sinkFundLinks) return;
+  state.budget.sinkFundLinks = state.budget.sinkFundLinks.filter(id=>id!==fundId);
+  save();
+  renderBudgetMonthly();
+}
 function saveBrow() {
   const name = document.getElementById('brow-name').value.trim();
   if (!name) { alert('Name is required.'); return; }
@@ -4589,6 +4680,16 @@ function _allIncomeActual(ym) {
 function _allExpenseActual(ym) {
   return (state.expenses||[]).filter(e=>e.ym===ym&&e.type==='expense').reduce((s,e)=>s+(e.amount||0),0);
 }
+function _allSavingsActual(ym) {
+  // savings_payment entries + expenses linked to savings budget rows
+  const savRowIds = new Set((state.budget.rows||[]).filter(r=>r.section==='savings').map(r=>r.id));
+  return (state.expenses||[]).filter(e=>e.ym===ym &&
+    (e.type==='savings_payment' || (e.type==='expense' && e.rowId && savRowIds.has(e.rowId)))
+  ).reduce((s,e)=>s+(e.amount||0),0);
+}
+function _allDebtActual(ym) {
+  return (state.expenses||[]).filter(e=>e.ym===ym&&e.type==='debt_payment').reduce((s,e)=>s+(e.amount||0),0);
+}
 // Inner HTML for a progress bar (no <td> wrapper). mode: 'income' (higher=good) | 'expense' (lower=good)
 function _progInner(actual, planned, mode) {
   if (!planned) {
@@ -4635,17 +4736,33 @@ function renderBudgetMonthly() {
   const savRows = rows.filter(r=>r.section==='savings');
   const expRows = rows.filter(r=>r.section==='expense');
   const activeDebts = state.creditors.filter(c=>isDebtBudgetActive(c.id));
-  const savFunds = (state.savings.funds||[]).filter(f=>f.monthly>0);
-  const activeSubs = (state.budget.subscriptions||[]).filter(s=>s.active!==false && isSubActive(s.id) && (!s.startDate || s.startDate<=ym));
+  const savFunds    = (state.savings.funds||[]).filter(f=>f.monthly>0);
+  const sinkFunds   = savFunds.filter(f=>(f.type||'sinking')==='sinking');
+  const nonSinkFunds= savFunds.filter(f=>(f.type||'sinking')!=='sinking');
+  const activeSubs  = (state.budget.subscriptions||[]).filter(s=>s.active!==false && isSubActive(s.id) && (!s.startDate || s.startDate<=ym));
 
-  const totalInc       = incRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
-  const totalSavCustom = savRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
-  const totalSavPlan   = savFunds.reduce((s,f)=>{
+  const sinkBudgetRows = rows.filter(r=>r.section==='sinking');
+
+  const _planFundTotal = (funds) => funds.reduce((s,f)=>{
     if (!isSavingsPlanActive(f.id)) return s;
     const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
     return s+(inRange?(f.monthly||0):0);
   },0);
-  const totalSav       = totalSavCustom + totalSavPlan;
+  const _fundActualTotal = (funds) => funds.reduce((s,f)=>{
+    const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
+    if (!inRange) return s;
+    const h=(state.savings.history||{})[`${ym}-${f.id}`]||{};
+    return s+r2(h.actual??0);
+  },0);
+
+  const totalInc       = incRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
+  const totalSavCustom = savRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
+  const totalSavInv    = totalSavCustom + _planFundTotal(nonSinkFunds);
+  const linkedFunds    = (state.budget.sinkFundLinks||[]).map(id=>(state.savings.funds||[]).find(f=>f.id===id)).filter(Boolean);
+  const linkedFundPlan = linkedFunds.reduce((s,f)=>s+(isSavingsPlanActive(f.id)?r2(f.monthly||0):0),0);
+  const totalSinkFund  = _planFundTotal(sinkFunds.filter(f=>!(state.budget.sinkFundLinks||[]).includes(f.id)))
+    + linkedFundPlan + sinkBudgetRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
+  const totalSav       = totalSavInv + totalSinkFund;
   const totalDebt      = activeDebts.reduce((s,c)=>s+getDebtScheduledPayment(c.id,ym),0);
   const totalExpCustom = expRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSubExp    = activeSubs.reduce((s,sub)=>s+(sub.amount||0),0);
@@ -4661,11 +4778,12 @@ function renderBudgetMonthly() {
     const acc=r.accountId?acctName(r.accountId):'';
     return `<tr>
       <td style="color:var(--g500);font-size:.78rem">${esc(r.category||'')}</td>
-      <td>${esc(r.name)}<span class="row-acts">
-        <button class="btn bg bxs" onclick="editBudgetRow('${r.id}')" title="Edit">✏️</button>
-        ${isLocked?'':`<button class="btn bd bxs" onclick="deleteBudgetRow('${r.id}')" title="Delete">✕</button>`}
-      </span></td>
-      <td style="font-size:.78rem;color:var(--g500)">${acc}</td>
+      <td>${esc(r.name)}${acc?`<span class="bm-acct-mob">📂 ${acc}</span>`:''}
+        <span class="row-acts">
+          <button class="btn bg bxs" onclick="editBudgetRow('${r.id}')" title="Edit">✏️</button>
+          ${isLocked?'':`<button class="btn bd bxs" onclick="deleteBudgetRow('${r.id}')" title="Delete">✕</button>`}
+        </span></td>
+      <td class="bm-acct-col" style="font-size:.78rem;color:var(--g500)">${acc}</td>
       <td class="nr"><input class="bamount" type="number" min="0" step="0.01" value="${val?r2(val):''}"
         placeholder="0.00" oninput="setBVal('${r.id}','${ym}',this.value);_refreshBudgetMonthlyTotals()"></td>
       ${_progCell(actual, val, mode||'expense')}
@@ -4684,7 +4802,7 @@ function renderBudgetMonthly() {
     return `<tr class="${active?'':'brow-inactive'}">
       <td style="color:var(--g500);font-size:.78rem">Debt</td>
       <td>💳 ${esc(c.name)} <span class="badge bor" style="font-size:.6rem">auto · Debt Calc</span></td>
-      <td style="font-size:.78rem;color:var(--g500)">—</td>
+      <td class="bm-acct-col" style="font-size:.78rem;color:var(--g500)">—</td>
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
@@ -4708,7 +4826,7 @@ function renderBudgetMonthly() {
     return `<tr class="${active?'':'brow-inactive'}">
       <td style="color:var(--g500);font-size:.78rem">Savings Plan</td>
       <td>🎯 ${esc(f.name)} <span class="badge" style="font-size:.6rem;background:var(--purple-pale);color:var(--purple)">auto · Savings</span></td>
-      <td style="font-size:.78rem;color:var(--g500)">—</td>
+      <td class="bm-acct-col" style="font-size:.78rem;color:var(--g500)">—</td>
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
@@ -4716,6 +4834,32 @@ function renderBudgetMonthly() {
         </div>
       </td>
       ${_progCell(actual, active?amt:0, 'expense')}
+    </tr>`;
+  }
+
+  // Linked sinking fund row — always visible regardless of date range, has unlink button
+  function linkedFundRow(f) {
+    if (!f) return '';
+    const active = isSavingsPlanActive(f.id);
+    const amt = f.monthly || 0;
+    const key = `${ym}-${f.id}`;
+    const h = (state.savings.history||{})[key] || {};
+    const actual = r2(h.actual != null ? h.actual : 0);
+    const inRange = (!f.startDate || ym >= f.startDate) && (!f.targetDate || ym <= f.targetDate.slice(0,7));
+    const rangeNote = inRange ? '' : `<span style="font-size:.65rem;color:var(--orange2);margin-left:.3rem">⚠ out of range</span>`;
+    return `<tr class="${active&&inRange?'':'brow-inactive'}">
+      <td style="color:var(--g500);font-size:.78rem">Sinking Fund</td>
+      <td>🏦 ${esc(f.name)}${rangeNote}<span class="row-acts">
+        <button class="btn bd bxs" onclick="removeSinkFundLink('${f.id}')" title="Remove from budget">✕</button>
+      </span></td>
+      <td class="bm-acct-col" style="font-size:.78rem;color:var(--g500)">—</td>
+      <td class="nr" style="vertical-align:middle">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
+          <span style="opacity:${active&&inRange?1:.4}">${fmt(amt)}</span>
+          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSavingsPlanActive('${f.id}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
+        </div>
+      </td>
+      ${_progCell(actual, active&&inRange?amt:0, 'expense')}
     </tr>`;
   }
 
@@ -4727,8 +4871,8 @@ function renderBudgetMonthly() {
     const actual=(state.expenses||[]).filter(e=>e.ym===ym&&e.type==='expense'&&(e.subId===sub.id||e.name===sub.name)).reduce((s,e)=>s+(e.amount||0),0);
     return `<tr class="${active?'':'brow-inactive'}">
       <td style="color:var(--g500);font-size:.78rem">${esc(sub.category||'Subscription')}</td>
-      <td>🔄 ${esc(sub.name)} <span class="badge bb" style="font-size:.6rem">auto · Subscriptions</span></td>
-      <td style="font-size:.78rem;color:var(--g500)">${acctN}</td>
+      <td>🔄 ${esc(sub.name)} <span class="badge bb" style="font-size:.6rem">auto · Subscriptions</span>${acctN&&acctN!=='—'?`<span class="bm-acct-mob">📂 ${acctN}</span>`:''}</td>
+      <td class="bm-acct-col" style="font-size:.78rem;color:var(--g500)">${acctN}</td>
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
@@ -4747,10 +4891,26 @@ function renderBudgetMonthly() {
 
   const noRows=`<tr><td colspan="${C}" style="color:var(--g400);font-size:.8rem;padding:.6rem 1rem">No rows yet — use "+ Add Row" to add one.</td></tr>`;
 
+  // Unplanned expenses: type=expense, no rowId, not matched to any subscription
+  const _subIdSet   = new Set((state.budget.subscriptions||[]).map(s=>s.id));
+  const _subNameSet = new Set((state.budget.subscriptions||[]).map(s=>s.name));
+  const unplannedActual = (state.expenses||[])
+    .filter(e=>e.ym===ym && e.type==='expense' && !e.rowId &&
+      !_subIdSet.has(e.subId) && !_subNameSet.has(e.name))
+    .reduce((s,e)=>s+(e.amount||0),0);
+
   // Section actuals
-  const actInc  = _allIncomeActual(ym);
-  const actExp  = _allExpenseActual(ym);
-  const actSav  = _sectionActual('savings', ym);
+  const actInc       = _allIncomeActual(ym);
+  const actExp       = _allExpenseActual(ym);
+  const actSav       = _sectionActual('savings', ym) + _fundActualTotal(nonSinkFunds);
+  const linkedFundActual = linkedFunds.reduce((s,f)=>{
+    const h=(state.savings.history||{})[`${ym}-${f.id}`]||{};
+    return s+r2(h.actual??0);
+  },0);
+  const actSinkFund  = _fundActualTotal(sinkFunds.filter(f=>!(state.budget.sinkFundLinks||[]).includes(f.id)))
+    + linkedFundActual + sinkBudgetRows.reduce((s,r)=>s+_rowActual(r.id,'sinking',ym),0);
+  const actDebt      = _allDebtActual(ym);
+  const actSavAll    = _allSavingsActual(ym);
 
   el.innerHTML = `
   <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:.6rem">
@@ -4759,7 +4919,7 @@ function renderBudgetMonthly() {
     </button>
   </div>
   <table class="bmonth-tbl${isLocked?' locked':''}">
-    <thead><tr><th>Category</th><th>Particulars</th><th>Account</th><th class="nr">Planned</th><th class="nr-act">Actual</th></tr></thead>
+    <thead><tr><th>Category</th><th>Particulars</th><th class="bm-acct-col">Account</th><th class="nr">Planned</th><th class="nr-act">Actual</th></tr></thead>
     <tbody>
       <tr class="sect-row"><td colspan="${C}">💚 Income</td></tr>
       ${incRows.length?incRows.map(r=>customRow(r,'income')).join(''):noRows}
@@ -4770,12 +4930,12 @@ function renderBudgetMonthly() {
 
       <tr class="sect-row"><td colspan="${C}">💙 Savings &amp; Investments</td></tr>
       ${savRows.map(r=>customRow(r,'expense')).join('')}
-      ${savFunds.map(savingsPlanRow).join('')}
-      ${(!savRows.length&&!savFunds.length)?noRows:''}
+      ${nonSinkFunds.map(savingsPlanRow).join('')}
+      ${(!savRows.length&&!nonSinkFunds.length)?noRows:''}
       ${addRowBtn('savings','Savings')}
       <tr class="total-row"><td colspan="2"><strong>Total Savings</strong></td><td></td>
-        <td class="nr" id="bmt-sav"><strong>${fmt(totalSav)}</strong></td>
-        <td class="bactual-cell">${_progCell(actSav,totalSav,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
+        <td class="nr" id="bmt-sav"><strong>${fmt(totalSavInv)}</strong></td>
+        <td class="bactual-cell">${_progCell(actSav,totalSavInv,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
 
       ${state.creditors.length?`
       <tr class="sect-row"><td colspan="${C}">💳 Debt Payments</td></tr>
@@ -4783,7 +4943,7 @@ function renderBudgetMonthly() {
       ${state.schedule.length&&state.creditors.every(c=>getDebtScheduledPayment(c.id,ym)===0)?`<tr><td colspan="${C}" style="color:var(--g400);font-size:.8rem;padding:.6rem 1rem">All debts paid off this month 🎉</td></tr>`:''}
       <tr class="total-row"><td colspan="2"><strong>Total Debt (Active)</strong></td><td></td>
         <td class="nr" id="bmt-debt"><strong>${fmt(totalDebt)}</strong></td>
-        <td class="bactual-cell" id="bmt-debt-act"></td></tr>`:''}
+        <td class="bactual-cell" id="bmt-debt-act">${_progCell(actDebt,totalDebt,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>`:''}
 
       <tr class="calc-row">
         <td colspan="3">💵 <strong>Remaining for Expenses</strong>
@@ -4794,17 +4954,36 @@ function renderBudgetMonthly() {
       <tr class="sect-row"><td colspan="${C}">🔴 Expenses</td></tr>
       ${expRows.length?expRows.map(r=>customRow(r,'expense')).join(''):noRows}
       ${(state.budget.subscriptions||[]).filter(s=>s.active!==false && (!s.startDate||s.startDate<=ym)).map(subRow).join('')}
+      ${unplannedActual>0?`<tr style="opacity:.85">
+        <td style="color:var(--g400);font-size:.78rem">Unplanned</td>
+        <td style="color:var(--g500);font-style:italic">Other / Unbudgeted Expenses</td>
+        <td></td>
+        <td class="nr" style="color:var(--g400)">—</td>
+        ${_progCell(unplannedActual,0,'expense')}
+      </tr>`:''}
       ${addRowBtn('expense','Expense')}
       <tr class="total-row"><td colspan="2"><strong>Total Expenses</strong></td><td></td>
         <td class="nr" id="bmt-exp"><strong>${fmt(totalExp)}</strong></td>
         <td class="bactual-cell">${_progCell(actExp,totalExp,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
 
+      <tr class="sect-row"><td colspan="${C}">🏦 Sinking Funds</td></tr>
+      ${sinkBudgetRows.map(r=>customRow(r,'expense')).join('')}
+      ${(state.budget.sinkFundLinks||[]).map(id=>(state.savings.funds||[]).find(f=>f.id===id)).map(linkedFundRow).join('')}
+      ${sinkFunds.filter(f=>!(state.budget.sinkFundLinks||[]).includes(f.id)).map(savingsPlanRow).join('')}
+      ${(!sinkBudgetRows.length&&!(state.budget.sinkFundLinks||[]).length&&!sinkFunds.some(f=>{const ir=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));return ir;}))?noRows:''}
+      <tr><td colspan="${C}" style="padding:.3rem .5rem">
+        <button class="btn bg bxs" onclick="openSinkAddModal()" style="font-size:.75rem">+ Add Sinking Fund Row</button>
+      </td></tr>
+      <tr class="total-row"><td colspan="2"><strong>Total Sinking Funds</strong></td><td></td>
+        <td class="nr" id="bmt-sink"><strong>${fmt(totalSinkFund)}</strong></td>
+        <td class="bactual-cell">${_progCell(actSinkFund,totalSinkFund,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
+
       <tr class="net-row">
         <td colspan="3"><strong>💰 Net Cash Flow</strong>
-          <span style="font-size:.75rem;margin-left:.5rem;opacity:.7">= Income − Savings − Debt − Expenses</span></td>
+          <span style="font-size:.75rem;margin-left:.5rem;opacity:.7">= Income − Savings − Sinking Funds − Debt − Expenses</span></td>
         <td class="nr ${net>=0?'pos':'neg'}" id="bmt-net"><strong>${net>=0?'+':''}${fmt(net)}</strong></td>
         <td class="bactual-cell" style="font-size:.8rem;color:var(--g500)" id="bmt-net-act">
-          ${actInc||actExp ? (() => { const n=actInc-actExp; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span><div style="font-size:.68rem;color:var(--g400)">actual flow</div>`; })() : ''}
+          ${(actInc||actSavAll||actDebt||actExp) ? (() => { const n=actInc-actSavAll-actDebt-actExp; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span><div style="font-size:.68rem;color:var(--g400)">actual flow</div>`; })() : ''}
         </td></tr>
     </tbody>
   </table>`;
@@ -4818,12 +4997,18 @@ function _refreshBudgetMonthlyTotals() {
   const expRows=rows.filter(r=>r.section==='expense');
   const totalInc=incRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSavCustom=savRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
-  const totalSavPlan=(state.savings.funds||[]).filter(f=>f.monthly>0).reduce((s,f)=>{
-    if (!isSavingsPlanActive(f.id)) return s;
+  const savFunds=(state.savings.funds||[]).filter(f=>f.monthly>0);
+  const sinkFunds=savFunds.filter(f=>(f.type||'sinking')==='sinking');
+  const nonSinkFunds=savFunds.filter(f=>(f.type||'sinking')!=='sinking');
+  const _planFundTotal=funds=>funds.reduce((s,f)=>{
+    if(!isSavingsPlanActive(f.id)) return s;
     const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
     return s+(inRange?(f.monthly||0):0);
   },0);
-  const totalSav=totalSavCustom+totalSavPlan;
+  const sinkBudgetRows=rows.filter(r=>r.section==='sinking');
+  const totalSavInv=totalSavCustom+_planFundTotal(nonSinkFunds);
+  const totalSinkFund=_planFundTotal(sinkFunds)+sinkBudgetRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
+  const totalSav=totalSavInv+totalSinkFund;
   const totalDebt=state.creditors.filter(c=>isDebtBudgetActive(c.id)).reduce((s,c)=>s+getDebtScheduledPayment(c.id,ym),0);
   const totalExpCustom=expRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSubExp=(state.budget.subscriptions||[]).filter(s=>s.active!==false&&isSubActive(s.id)&&(!s.startDate||s.startDate<=ym)).reduce((s,sub)=>s+(sub.amount||0),0);
@@ -4831,8 +5016,8 @@ function _refreshBudgetMonthlyTotals() {
   const remaining=totalInc-totalSav-totalDebt;
   const net=totalInc-totalSav-totalExp-totalDebt;
   const upd=(id,val,pos)=>{ const el=document.getElementById(id); if(!el) return; el.innerHTML=`<strong>${pos&&val>=0?'+':''}${fmt(val)}</strong>`; el.className='nr '+(val>=0?'pos':'neg'); };
-  upd('bmt-inc',totalInc,false); upd('bmt-sav',totalSav,false); upd('bmt-debt',totalDebt,false);
-  upd('bmt-rem',remaining,false); upd('bmt-exp',totalExp,false); upd('bmt-net',net,true);
+  upd('bmt-inc',totalInc,false); upd('bmt-sav',totalSavInv,false); upd('bmt-sink',totalSinkFund,false);
+  upd('bmt-debt',totalDebt,false); upd('bmt-rem',remaining,false); upd('bmt-exp',totalExp,false); upd('bmt-net',net,true);
 }
 
 function editBudgetRow(rowId) {
@@ -6857,7 +7042,7 @@ function _setExpType(type) {
   const catSel  = document.getElementById('exp-cat-id');
   const catBudRow = document.getElementById('exp-cat-row-budget');
   if (catSel) {
-    const cats = type==='income' ? INCOME_CATS : type==='savings_payment' ? SAVINGS_CATS : EXPENSE_CATS;
+    const cats = _getCats(type);
     const prevCat = catSel.value;
     catSel.innerHTML = '<option value="">— Uncategorized —</option>' +
       cats.map(c=>`<option value="${c}">${c}</option>`).join('');
@@ -7729,6 +7914,75 @@ function _fmtSyncTime(ts) {
   return d.toLocaleDateString([], {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 }
 
+// ============================================================
+//  CATEGORY MANAGEMENT
+// ============================================================
+let _catsTab = 'expense';
+const _CATS_BASE = { expense:EXPENSE_CATS, income:INCOME_CATS, savings:SAVINGS_CATS, asset:ASSET_CATS, liability:LIABILITY_CATS };
+const _CATS_LABEL = { expense:'💸 Expense', income:'💚 Income', savings:'💙 Savings', asset:'🏦 Assets', liability:'💳 Liabilities' };
+
+function _setCatsTab(type, btn) {
+  _catsTab = type;
+  document.querySelectorAll('#cats-tab-bar .btn').forEach(b => { b.className = b.className.replace(' bp',' bg').replace('bp ','bg '); });
+  if (btn) btn.className = btn.className.replace(' bg',' bp').replace('bg ','bp ');
+  _renderCatsList();
+}
+function _renderCatsList() {
+  const el = document.getElementById('cats-list');
+  if (!el) return;
+  const type = _catsTab;
+  if (!state.budget.catConfig) state.budget.catConfig = {};
+  const cfg    = state.budget.catConfig[type] || { hidden:[], custom:[] };
+  const hidden = new Set(cfg.hidden||[]);
+  const custom = new Set(cfg.custom||[]);
+  const base   = _CATS_BASE[type] || EXPENSE_CATS;
+  const all    = [...base, ...(cfg.custom||[])];
+  el.innerHTML = all.map(c => {
+    const isHidden = hidden.has(c);
+    const isCustom = custom.has(c);
+    const safe = esc(c);
+    const safeJs = c.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div style="display:flex;align-items:center;gap:.35rem;padding:.28rem .25rem;border-bottom:1px solid var(--g100)">
+      <span style="flex:1;font-size:.83rem;${isHidden?'opacity:.35;text-decoration:line-through;color:var(--g400)':'color:var(--g800)'}">${safe}</span>
+      ${isCustom?`<span style="font-size:.62rem;background:var(--blue-pale);color:var(--blue2);border-radius:3px;padding:.05em .35em">custom</span>`:''}
+      <button class="btn bg bxs" title="${isHidden?'Show':'Hide'}" onclick="_toggleCatHide('${type}','${safeJs}')" style="font-size:.75rem;min-width:28px">${isHidden?'👁':'🙈'}</button>
+      ${isCustom?`<button class="btn bd bxs" title="Delete" onclick="_deleteCustomCat('${type}','${safeJs}')" style="font-size:.75rem;min-width:28px">✕</button>`:''}
+    </div>`;
+  }).join('') || '<div style="color:var(--g400);font-size:.82rem;padding:.5rem">No categories yet.</div>';
+}
+function _addCat() {
+  const input = document.getElementById('cats-new-input');
+  const name  = (input?.value||'').trim();
+  if (!name) return;
+  if (!state.budget.catConfig) state.budget.catConfig = {};
+  if (!state.budget.catConfig[_catsTab]) state.budget.catConfig[_catsTab] = { hidden:[], custom:[] };
+  const custom = state.budget.catConfig[_catsTab].custom;
+  const base   = _CATS_BASE[_catsTab]||[];
+  if ([...base,...custom].includes(name)) { _toast('Category already exists'); return; }
+  custom.push(name);
+  if (input) input.value = '';
+  save();
+  _renderCatsList();
+}
+function _toggleCatHide(type, name) {
+  if (!state.budget.catConfig) state.budget.catConfig = {};
+  if (!state.budget.catConfig[type]) state.budget.catConfig[type] = { hidden:[], custom:[] };
+  const arr = state.budget.catConfig[type].hidden;
+  const idx = arr.indexOf(name);
+  if (idx>=0) arr.splice(idx,1); else arr.push(name);
+  save();
+  _renderCatsList();
+}
+function _deleteCustomCat(type, name) {
+  const cfg = state.budget?.catConfig?.[type];
+  if (!cfg?.custom) return;
+  _confirmDel(`Delete category "${name}"?`, () => {
+    cfg.custom = cfg.custom.filter(c=>c!==name);
+    save();
+    _renderCatsList();
+  });
+}
+
 async function _settingsRender() {
   // ── File Sync (desktop FSA) ──
   const fsaEl = document.getElementById('settings-sync-body');
@@ -7801,6 +8055,8 @@ async function _settingsRender() {
           )">Test &amp; Connect</button>
       </div>`;
   }
+  // ── Categories ──
+  _renderCatsList();
 }
 
 
