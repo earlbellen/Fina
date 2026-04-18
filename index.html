@@ -1734,8 +1734,12 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
       </div>
     </div>
     <div class="fg">
-      <label>Budget Category / Row</label>
-      <select id="exp-row-id"></select>
+      <label>Category</label>
+      <select id="exp-cat-id"><option value="">— Uncategorized —</option></select>
+    </div>
+    <div class="fg" id="exp-cat-row-budget">
+      <label>Budget Row <span style="font-weight:400;color:var(--g400)">(optional)</span></label>
+      <select id="exp-row-id" onchange="_onExpRowChange()"></select>
     </div>
     <div class="fg" id="exp-account-row">
       <label id="exp-account-label">Account / Wallet</label>
@@ -1780,6 +1784,22 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
     <div class="fg">
       <label>Notes</label>
       <input type="text" id="transfer-notes" placeholder="Optional">
+    </div>
+    <div class="fg" style="padding:.35rem 0 0">
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-weight:500;font-size:.9rem">
+        <input type="checkbox" id="transfer-fee-chk" onchange="_toggleTransferFee()" style="width:16px;height:16px;cursor:pointer">
+        Includes transaction fee
+      </label>
+    </div>
+    <div id="transfer-fee-row" style="display:none" class="frow">
+      <div class="fg">
+        <label>Fee Amount *</label>
+        <input type="number" id="transfer-fee-amount" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="fg">
+        <label>Fee charged to</label>
+        <select id="transfer-fee-acct"></select>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn bg" onclick="closeTransferModal()">Cancel</button>
@@ -3798,6 +3818,7 @@ const EXPENSE_CATS   = [
   // Finance
   'Loan Payment',
   'Investment / Finance App',
+  'Transaction Fee',
   // Other
   'Gifts & Donations',
   'Pets',
@@ -6547,7 +6568,7 @@ function renderExpMonthly() {
     const runCell = runBal !== null ? `<td class="nr exp-col-bal" style="font-size:.78rem;color:var(--g500)">${fmt(runningMap[e.id]||0)}</td>` : '';
     // Category label
     const _isSpecialType = t => ['savings_payment','debt_payment','transfer_out','transfer_in','adjustment'].includes(t);
-    const _catText = e.type==='adjustment' ? 'Adjustment' : (_isSpecialType(e.type) ? typeLabel(e) : rowName(e.rowId));
+    const _catText = e.type==='adjustment' ? 'Adjustment' : (_isSpecialType(e.type) ? typeLabel(e) : (e.rowId ? rowName(e.rowId) : (e.category || 'Uncategorized')));
     const catLabel = _isSpecialType(e.type)
       ? `<span class="badge" style="font-size:.7rem;background:var(--blue-pale,#eff6ff);color:#2563eb">${_catText}</span>`
       : `<span class="badge bgr" style="font-size:.7rem">${_catText}</span>`;
@@ -6770,6 +6791,19 @@ function renderExpDashboard() {
     ctx.parentElement.innerHTML = '<p style="text-align:center;color:var(--g400);padding:2rem">No categorized expenses this month. Add budget rows and link expenses to them.</p>';
   }
 }
+function _onExpRowChange() {
+  const val = document.getElementById('exp-row-id')?.value;
+  if (!val) return;
+  let cat = null;
+  if (String(val).startsWith('sub:')) {
+    const s = (state.budget.subscriptions||[]).find(x=>x.id===val.slice(4));
+    cat = s?.category || null;
+  } else {
+    const r = (state.budget.rows||[]).find(x=>x.id===val);
+    cat = r?.category || null;
+  }
+  if (cat) { const sel = document.getElementById('exp-cat-id'); if (sel) sel.value = cat; }
+}
 function _updateAdjInfo() {
   const type = document.getElementById('exp-type')?.value;
   const adjRow  = document.getElementById('exp-adj-row');
@@ -6818,6 +6852,19 @@ function _setExpType(type) {
 
   // Update adjustment info row
   _updateAdjInfo();
+
+  // Populate category dropdown based on type
+  const catSel  = document.getElementById('exp-cat-id');
+  const catBudRow = document.getElementById('exp-cat-row-budget');
+  if (catSel) {
+    const cats = type==='income' ? INCOME_CATS : type==='savings_payment' ? SAVINGS_CATS : EXPENSE_CATS;
+    const prevCat = catSel.value;
+    catSel.innerHTML = '<option value="">— Uncategorized —</option>' +
+      cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    if (prevCat && cats.includes(prevCat)) catSel.value = prevCat;
+    catSel.closest('.fg').style.display = type==='adjustment' ? 'none' : '';
+  }
+  if (catBudRow) catBudRow.style.display = (type==='adjustment'||type==='savings_payment'||type==='debt_payment') ? 'none' : '';
 
   // Move account row to top for adjustment (wallet must be selected first)
   const acctRow = document.getElementById('exp-account-row');
@@ -6898,6 +6945,8 @@ function openExpModal(id, presetType) {
     if (c) document.getElementById('exp-name').value = c.name + ' Payment';
   }
   _populateAcctDropdown('exp-account', e?(e.accountId||''):'');
+  const catSel2 = document.getElementById('exp-cat-id');
+  if (catSel2 && e && e.category) catSel2.value = e.category;
   _updateAdjInfo();
   document.getElementById('exp-modal').classList.add('open');
   setTimeout(()=>document.getElementById('exp-name').focus(),50);
@@ -6943,6 +6992,7 @@ function saveExp() {
 
   const obj={id,name,date,ym,amount,type,
     rowId: (type==='savings_payment'||type==='debt_payment') ? null : (document.getElementById('exp-row-id').value||null),
+    category: type==='adjustment' ? null : (document.getElementById('exp-cat-id')?.value||null),
     fundId, creditorId, accountId,
     adjPositive, adjNewBalance, adjOldBalance,
     notes:document.getElementById('exp-notes').value.trim()};
@@ -7064,9 +7114,23 @@ function openTransferModal(id) {
   document.getElementById('transfer-notes').value  = t ? (t.notes||'') : '';
   _populateAcctDropdown('transfer-from', t?(t.accountId||''):'');
   _populateAcctDropdown('transfer-to',   t?(t.toAccountId||''):'');
+  _populateAcctDropdown('transfer-fee-acct', '');
+  document.getElementById('transfer-fee-chk').checked = false;
+  document.getElementById('transfer-fee-row').style.display = 'none';
+  document.getElementById('transfer-fee-amount').value = '';
   document.getElementById('transfer-modal').classList.add('open');
 }
 function closeTransferModal() { document.getElementById('transfer-modal').classList.remove('open'); }
+function _toggleTransferFee() {
+  const chk = document.getElementById('transfer-fee-chk');
+  document.getElementById('transfer-fee-row').style.display = chk.checked ? '' : 'none';
+  // Default fee wallet to "from" wallet for convenience
+  if (chk.checked) {
+    const fromId = document.getElementById('transfer-from').value;
+    const feeAcct = document.getElementById('transfer-fee-acct');
+    if (feeAcct && fromId) feeAcct.value = fromId;
+  }
+}
 function saveTransfer() {
   const amount = parseFloat(document.getElementById('transfer-amount').value);
   const date   = document.getElementById('transfer-date').value;
@@ -7096,6 +7160,22 @@ function saveTransfer() {
     date, ym, amount:r2(amount), type:'transfer_in',  accountId:toId,  fromAccountId:fromId, pairId:outId, notes});
   _recomputeBalance(fromId);
   _recomputeBalance(toId);
+  // Log transaction fee as a separate expense if checked
+  if (document.getElementById('transfer-fee-chk').checked) {
+    const feeAmt = parseFloat(document.getElementById('transfer-fee-amount').value);
+    const feeAcctId = document.getElementById('transfer-fee-acct').value || fromId;
+    if (!isNaN(feeAmt) && feeAmt > 0) {
+      const fromName = state.budget.accounts.find(x=>x.id===fromId)?.name || '?';
+      const toName   = state.budget.accounts.find(x=>x.id===toId)?.name   || '?';
+      state.expenses.push({
+        id: 'fee'+Date.now(), name:`Transfer Fee (${fromName} → ${toName})`,
+        date, ym, amount:r2(feeAmt), type:'expense',
+        category:'Transaction Fee', accountId:feeAcctId,
+        notes: notes ? notes+' — fee' : 'Transfer fee', rowId:null
+      });
+      _recomputeBalance(feeAcctId);
+    }
+  }
   _expYM = ym;
   _expWalletFilter = null; // reset wallet filter so both sides of the transfer are visible
   closeTransferModal();
