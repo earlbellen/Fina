@@ -217,7 +217,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   .mod-btn{
     flex:1 1 0;
     width:auto;
-    min-height:50px;
+    min-height:58px;
     margin:0;
     padding:.45rem .1rem .45rem;
     border:none;border-top:2.5px solid transparent;
@@ -233,7 +233,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   .mod-btn .mod-ico{font-size:1.5rem;line-height:1;display:block}
   .mod-btn .mbl{display:none}
   /* Show label only on active tab */
-  .mod-btn.active .mod-label{display:block;font-size:.6rem;font-weight:700;line-height:1.2;margin-top:.15rem;white-space:nowrap}
+  .mod-btn.active .mod-label{display:block;font-size:.58rem;font-weight:700;line-height:1.1;margin-top:.1rem;white-space:normal;text-align:center;word-break:break-word}
   .mod-btn.active .mod-ico{font-size:1.2rem}
   /* Bigger touch targets for action buttons on mobile */
   .btn.bxs{min-height:38px;min-width:38px}
@@ -466,7 +466,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .mod-btn.active.mod-savings{color:#d97706;border-bottom-color:#d97706}
 .mod-btn.active.mod-expenses{color:var(--orange2);border-bottom-color:var(--orange2)}
 .mod-btn.active.mod-nw{color:var(--blue2);border-bottom-color:var(--blue2)}
-#debt-subnav{position:sticky;top:103px;z-index:99}
+#debt-subnav{position:sticky;top:110px;z-index:99}
 
 /* ═══════════════════════════════════════════════════════════
    ACCOUNT CARDS
@@ -559,10 +559,14 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 /* ═══════════════════════════════════════════════════════════
    SUB-NAVIGATION (Budget / Net Worth / Savings pages)
 ═══════════════════════════════════════════════════════════ */
-.sub-nav{display:flex;background:#fff;border:1px solid var(--g200);border-radius:var(--r);margin-bottom:1.25rem;overflow-x:auto;box-shadow:var(--sh);position:sticky;top:103px;z-index:98}
+.sub-nav{display:flex;background:#fff;border:1px solid var(--g200);border-radius:var(--r);margin-bottom:1.25rem;overflow-x:auto;box-shadow:var(--sh);position:sticky;top:110px;z-index:98}
 .sub-nav-btn{background:none;border:none;border-bottom:3px solid transparent;padding:.7rem 1.1rem;font-size:.83rem;font-weight:600;color:var(--g500);cursor:pointer;transition:all .15s;white-space:nowrap;margin-bottom:-1px}
 .sub-nav-btn:hover{color:var(--g700);background:var(--g50)}
 .sub-nav-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+@media(max-width:768px){
+  .sub-nav{position:-webkit-sticky!important;position:sticky!important;top:50px!important;overflow:visible!important;z-index:149!important}
+  #debt-subnav{top:50px!important;z-index:149!important}
+}
 .sub-page{display:none}.sub-page.active{display:block;animation:fadeIn .15s ease}
 
 /* Month / Year pill navigation */
@@ -609,9 +613,9 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .agrid td.sc{text-align:left;white-space:nowrap;min-width:160px}
 .agrid td.fyc{background:#fef9c3;font-weight:700}
 /* Frozen first two columns + sticky header row */
-.agrid thead th{position:sticky;top:148px;z-index:3;background:var(--g50)}
-.agrid th.fc{position:sticky;left:0;top:148px;z-index:6;background:var(--g50)}
-.agrid th.sc{position:sticky;left:120px;top:148px;z-index:6;background:var(--g50);box-shadow:2px 0 4px rgba(0,0,0,.07)}
+.agrid thead th{position:sticky;top:156px;z-index:3;background:var(--g50)}
+.agrid th.fc{position:sticky;left:0;top:156px;z-index:6;background:var(--g50)}
+.agrid th.sc{position:sticky;left:120px;top:156px;z-index:6;background:var(--g50);box-shadow:2px 0 4px rgba(0,0,0,.07)}
 .agrid td.fc{position:sticky;left:0;z-index:2;background:#fff}
 .agrid td.sc{position:sticky;left:120px;z-index:2;background:#fff;box-shadow:2px 0 4px rgba(0,0,0,.07)}
 .agrid .srow td.fc,.agrid .srow td.sc{background:var(--g100)}
