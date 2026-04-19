@@ -46,7 +46,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* Tab panels */
 .tab{display:none}.tab.active{display:block;animation:fadeIn .18s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 
 /* Page title */
@@ -183,13 +183,8 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 /* ── Mobile-only elements (hidden on desktop) ── */
 .exp-mob-meta{display:none}
 .exp-hdr-btns{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.exp-fab{display:none;position:fixed;bottom:calc(1.5rem + env(safe-area-inset-bottom));right:1.25rem;z-index:150;width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;font-size:1.65rem;font-weight:300;line-height:1;box-shadow:0 4px 16px rgba(29,78,137,.4);border:none;cursor:pointer;align-items:center;justify-content:center;transition:transform .2s,background .2s;touch-action:manipulation}
-.exp-fab:active{transform:scale(.92)}
-.exp-fab.fab-open{background:var(--g600);transform:rotate(45deg)}
-.exp-fab-menu{display:none;position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom));right:1.25rem;z-index:150;flex-direction:column;align-items:flex-end;gap:.45rem}
-.exp-fab-menu.fab-open{display:flex}
-.exp-fab-item{display:flex;align-items:center;gap:.6rem;background:#fff;color:var(--g800);border:1px solid var(--g200);border-radius:22px;padding:.5rem 1rem .5rem .8rem;font-size:.85rem;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.exp-fab-item:active{background:var(--g50);transform:scale(.97)}
+/* Expense FAB uses the shared .bm-fab-* classes */
+#exp-fab-wrap{z-index:300}
 
 /* Responsive */
 @media(max-width:900px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
@@ -233,7 +228,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   .mod-btn .mod-ico{font-size:1.5rem;line-height:1;display:block}
   .mod-btn .mbl{display:none}
   /* Show label only on active tab */
-  .mod-btn.active .mod-label{display:block;font-size:.58rem;font-weight:700;line-height:1.1;margin-top:.1rem;white-space:normal;text-align:center;word-break:break-word}
+  .mod-btn.active .mod-label{display:block;font-size:.5rem;font-weight:700;line-height:1.15;margin-top:.1rem;white-space:normal;text-align:center;word-break:break-word}
   .mod-btn.active .mod-ico{font-size:1.2rem}
   /* Bigger touch targets for action buttons on mobile */
   .btn.bxs{min-height:38px;min-width:38px}
@@ -377,9 +372,9 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   /* Slightly more compact expense table on mobile */
   .tbl td,.tbl th{padding:.38rem .45rem}
 
-  /* ── Expense log: raise FAB above bottom tab bar ─────── */
-  .exp-fab{bottom:calc(5.8rem + env(safe-area-inset-bottom))}
-  .exp-fab-menu{bottom:calc(9.2rem + env(safe-area-inset-bottom))}
+  /* ── Raise FABs above bottom tab bar ─────────────────── */
+  #exp-fab-wrap{bottom:calc(5.8rem + env(safe-area-inset-bottom))}
+  #bm-fab-wrap{bottom:calc(5.8rem + env(safe-area-inset-bottom))}
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -564,8 +559,8 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .sub-nav-btn:hover{color:var(--g700);background:var(--g50)}
 .sub-nav-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
 @media(max-width:768px){
-  .sub-nav{position:-webkit-sticky!important;position:sticky!important;top:50px!important;overflow:visible!important;z-index:149!important}
-  #debt-subnav{top:50px!important;z-index:149!important}
+  .sub-nav{position:-webkit-sticky!important;position:sticky!important;top:50px!important;z-index:149!important}
+  #debt-subnav{position:-webkit-sticky!important;position:sticky!important;top:50px!important;z-index:149!important}
 }
 .sub-page{display:none}.sub-page.active{display:block;animation:fadeIn .15s ease}
 
@@ -598,6 +593,24 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .bamount:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(45,106,191,.1)}
 .bmonth-tbl tbody tr:hover td{background:var(--g50)}
 .bmonth-tbl .sect-row:hover td,.bmonth-tbl .total-row:hover td,.bmonth-tbl .calc-row:hover td,.bmonth-tbl .debt-row:hover td,.bmonth-tbl .net-row:hover td,.bmonth-tbl .cat-row:hover td{background:inherit!important}
+/* Budget Monthly FAB */
+.bm-fab-wrap{position:fixed;bottom:calc(1.5rem + env(safe-area-inset-bottom));right:1.25rem;z-index:200;display:none;flex-direction:column;align-items:flex-end;gap:.45rem}
+#budp-monthly.active .bm-fab-wrap{display:flex}
+.bm-fab-trigger{width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;font-size:1.65rem;font-weight:300;line-height:1;box-shadow:0 4px 16px rgba(29,78,137,.4);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;touch-action:manipulation;flex-shrink:0}
+.bm-fab-trigger:active{transform:scale(.92)}
+.bm-fab-wrap.open .bm-fab-trigger{background:var(--g600);transform:rotate(45deg)}
+.bm-fab-actions{display:none;flex-direction:column;align-items:flex-end;gap:.45rem}
+.bm-fab-wrap.open .bm-fab-actions{display:flex}
+.bm-fab-item{display:flex;align-items:center;gap:.6rem;background:#fff;color:var(--g800);border:1px solid var(--g200);border-radius:22px;padding:.5rem 1rem .5rem .8rem;font-size:.85rem;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.12);cursor:pointer;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.bm-fab-item:active{background:var(--g50);transform:scale(.97)}
+.bm-fab-sub{display:none;flex-direction:column;align-items:flex-end;gap:.3rem}
+.bm-fab-sub.open{display:flex}
+.bm-fab-sub-item{display:flex;align-items:center;gap:.6rem;background:#fff;color:var(--g800);border:1px solid var(--g200);border-radius:22px;padding:.4rem .9rem .4rem .7rem;font-size:.8rem;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.bm-fab-sub-item:active{background:var(--g50);transform:scale(.97)}
+.bm-fab-overlay{display:none;position:fixed;inset:0;z-index:199}
+.bm-fab-overlay.active{display:block}
+/* Prevent FAB from overlapping the Actual column */
+#budp-monthly .twrap{padding-right:80px}
 
 /* ═══════════════════════════════════════════════════════════
    ANNUAL GRID (Budget & Net Worth spreadsheet view)
@@ -631,8 +644,16 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 .agrid .nrow td{background:#eff6ff;font-weight:800;border-top:3px solid #93c5fd}
 .agrid .drow td{background:#fff8f0}
 .agrid tbody tr:hover td{background:var(--g50)!important}
-.agrid .srow:hover td,.agrid .crow:hover td,.agrid .trow:hover td,.agrid .rrow:hover td,.agrid .nrow:hover td,.agrid .drow:hover td{background:inherit!important}
+.agrid .srow:hover td,.agrid .crow:hover td,.agrid .trow:hover td,.agrid .rrow:hover td,.agrid .nrow:hover td,.agrid .drow:hover td,.agrid .arw-debt:hover td,.agrid .arw-sink:hover td{background:inherit!important}
 .agrid tbody tr:hover td.fc,.agrid tbody tr:hover td.sc{background:var(--g50)!important}
+/* Annual read-only variant — compact columns, no input widths */
+.agrid.ro th.fc,.agrid.ro td.fc{min-width:80px}
+.agrid.ro th.sc,.agrid.ro td.sc{min-width:110px}
+/* Calc row colours for annual view */
+.agrid .arw-debt td{background:#dbeafe;font-weight:700;border-top:2px solid #bfdbfe;font-style:italic;font-variant-numeric:tabular-nums}
+.agrid .arw-debt td.fc,.agrid .arw-debt td.sc{background:#dbeafe}
+.agrid .arw-sink td{background:#fef9c3;font-weight:700;border-top:2px solid #fde68a;font-style:italic;font-variant-numeric:tabular-nums}
+.agrid .arw-sink td.fc,.agrid .arw-sink td.sc{background:#fef9c3}
 .acell{width:70px;padding:.12rem .25rem;border:1px solid transparent;border-radius:3px;font-size:.77rem;text-align:right;background:transparent;color:var(--g800);font-variant-numeric:tabular-nums;-moz-appearance:textfield}
 .acell::-webkit-outer-spin-button,.acell::-webkit-inner-spin-button{-webkit-appearance:none}
 .acell:hover{border-color:var(--g300);background:rgba(255,255,255,.9)}
@@ -704,7 +725,7 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
   <button class="mod-btn mod-debt" onclick="showModule('debt',this)"><span class="mod-ico" aria-hidden="true">💳</span><span class="mod-label">Debt Calculator</span><span class="mbl">Debt</span></button>
   <button class="mod-btn mod-savings" onclick="showModule('savings',this)"><span class="mod-ico" aria-hidden="true">🎯</span><span class="mod-label">Savings</span><span class="mbl">Savings</span></button>
   <button class="mod-btn mod-budget" onclick="showModule('budget',this)"><span class="mod-ico" aria-hidden="true">💰</span><span class="mod-label">Budget Planner</span><span class="mbl">Budget</span></button>
-  <button class="mod-btn mod-expenses active" onclick="showModule('expenses',this)"><span class="mod-ico" aria-hidden="true">💸</span><span class="mod-label">Income/Expense</span><span class="mbl">Expenses</span></button>
+  <button class="mod-btn mod-expenses active" onclick="showModule('expenses',this)"><span class="mod-ico" aria-hidden="true">💸</span><span class="mod-label">Income/ Expense</span><span class="mbl">Expenses</span></button>
   <button class="mod-btn mod-nw" onclick="showModule('networth',this)"><span class="mod-ico" aria-hidden="true">📈</span><span class="mod-label">Net Worth</span><span class="mbl">Net Worth</span></button>
 </nav>
 
@@ -1080,13 +1101,32 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
           <span id="budget-month-label">—</span>
           <button onclick="changeBudgetMonth(1)">›</button>
         </div>
-        <button class="btn bg bsm" onclick="copyPrevMonth()" title="Copy all values from the previous month">📋 Copy Previous Month</button>
-        <button class="btn bg bsm" onclick="addBudgetRow()" title="Add a custom row">+ Add Row</button>
       </div>
     </div>
     <div class="card" style="padding:0">
       <div class="twrap" style="border:none"><div id="budget-monthly-content"></div></div>
     </div>
+    <!-- Budget Monthly FAB -->
+    <div class="bm-fab-wrap" id="bm-fab-wrap">
+      <div class="bm-fab-actions" id="bm-fab-actions">
+        <!-- Reset Month -->
+        <button class="bm-fab-item" onclick="resetBudgetMonth()">🔄 Reset Month</button>
+        <!-- Copy Previous Month -->
+        <button class="bm-fab-item" onclick="copyPrevMonth()">📋 Copy Previous Month</button>
+        <!-- Add Row with section picker -->
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.3rem">
+          <div class="bm-fab-sub" id="bm-fab-add-sub">
+            <button class="bm-fab-sub-item" onclick="openSinkAddModal();closeBudgetFAB()">🏦 Sinking Fund Row</button>
+            <button class="bm-fab-sub-item" onclick="openAddBudgetRow('expense');closeBudgetFAB()">🔴 Expense Row</button>
+            <button class="bm-fab-sub-item" onclick="openAddBudgetRow('savings');closeBudgetFAB()">💙 Savings Row</button>
+            <button class="bm-fab-sub-item" onclick="openAddBudgetRow('income');closeBudgetFAB()">💚 Income Row</button>
+          </div>
+          <button class="bm-fab-item" onclick="toggleBudgetFabAddSub(event)">➕ Add Row</button>
+        </div>
+      </div>
+      <button class="bm-fab-trigger" onclick="toggleBudgetFAB()" title="Budget actions">✚</button>
+    </div>
+    <div class="bm-fab-overlay" id="bm-fab-overlay" onclick="closeBudgetFAB()"></div>
   </div>
 
   <!-- Annual View sub-page -->
@@ -1204,15 +1244,18 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 </div>
 
 <!-- ── Expense FAB ── -->
-<div class="exp-fab-menu" id="exp-fab-menu">
-  <button class="exp-fab-item" onclick="openExpModal();closeFab()">💸 Expense</button>
-  <button class="exp-fab-item" onclick="openExpModal(null,'income');closeFab()">💚 Income</button>
-  <button class="exp-fab-item" onclick="openExpModal(null,'savings_payment');closeFab()">💙 Savings</button>
-  <button class="exp-fab-item" onclick="openExpModal(null,'debt_payment');closeFab()">💳 Debt Payment</button>
-  <button class="exp-fab-item" onclick="openTransferModal();closeFab()">⇄ Transfer</button>
-  <button class="exp-fab-item" onclick="openExpModal(null,'adjustment');closeFab()">⚖️ Adjust Balance</button>
+<div class="bm-fab-wrap" id="exp-fab-wrap">
+  <div class="bm-fab-actions" id="exp-fab-menu">
+    <button class="bm-fab-item" onclick="openExpModal(null,'adjustment');closeFab()">⚖️ Adjust Balance</button>
+    <button class="bm-fab-item" onclick="openTransferModal();closeFab()">⇄ Transfer</button>
+    <button class="bm-fab-item" onclick="openExpModal(null,'debt_payment');closeFab()">💳 Debt Payment</button>
+    <button class="bm-fab-item" onclick="openExpModal(null,'savings_payment');closeFab()">💙 Savings</button>
+    <button class="bm-fab-item" onclick="openExpModal(null,'income');closeFab()">💚 Income</button>
+    <button class="bm-fab-item" onclick="openExpModal();closeFab()">💸 Expense</button>
+  </div>
+  <button class="bm-fab-trigger" id="exp-fab" onclick="toggleFab()" aria-label="Log entry">✚</button>
 </div>
-<button class="exp-fab" id="exp-fab" onclick="toggleFab()" aria-label="Log entry">＋</button>
+<div class="bm-fab-overlay" id="exp-fab-overlay" onclick="closeFab()"></div>
 
 <!-- ===================== SAVINGS TAB ===================== -->
 <div class="tab" id="tab-savings">
@@ -1255,6 +1298,18 @@ hr{height:1px;background:var(--g200);border:none;margin:1.25rem 0}
 
 </div><!-- /content -->
 
+
+<!-- ===================== GENERIC CONFIRM MODAL ===================== -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal" style="max-width:380px">
+    <h3 id="confirm-modal-title">Are you sure?</h3>
+    <p id="confirm-modal-body" style="color:var(--g600);font-size:.92rem;line-height:1.55;margin-bottom:.25rem"></p>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="closeConfirmModal()">Cancel</button>
+      <button class="btn bd" id="confirm-modal-ok" onclick="closeConfirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== ADJUST BALANCE MODAL ===================== -->
 <div class="modal-overlay" id="adj-modal">
@@ -2100,14 +2155,19 @@ function load() {
       const p = JSON.parse(raw);
       state = { ...state, ...p };
       // Deep-merge nested objects so new sub-keys always exist
-      state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, sinkFundLinks:[], catConfig:{}, ...(p.budget || {}) };
+      state.budget   = { accounts:[], subscriptions:[], rows:[], monthlyData:{}, items:[], sinkingFunds:[], year:new Date().getFullYear(), debtActive:{}, sfActive:{}, lockedMonths:{}, savingsPlanActive:{}, subActive:{}, sinkFundLinks:[], catConfig:{}, monthlyActive:{}, ...(p.budget || {}) };
       state.budget.rows = (state.budget.rows||[]).filter(r => !r.isDefault);
       state.savings  = { funds:[], history:{}, ...(p.savings || {}) };
       if (!state.expenses) state.expenses = [];
       // Migration: fix negative adjOldBalance caused by old buggy save code
+      // Migration: convert rowId='sub:xxx' to subId (old format from expense log dropdown)
       state.expenses.forEach(e => {
         if (e.type==='adjustment' && e.adjOldBalance!=null && e.adjOldBalance < 0) {
           e.adjOldBalance = Math.abs(e.adjOldBalance);
+        }
+        if (e.rowId && typeof e.rowId === 'string' && e.rowId.startsWith('sub:')) {
+          e.subId = e.rowId.slice(4);
+          e.rowId = null;
         }
       });
       state.netWorth = { rows:[], monthlyData:{}, assets:[], liabilities:[], year:new Date().getFullYear(), ...(p.netWorth || {}) };
@@ -2124,20 +2184,23 @@ let _activeModule = 'expenses';
 
 // ── Expense FAB ──────────────────────────────────────────
 function toggleFab() {
-  const fab = document.getElementById('exp-fab');
-  const menu = document.getElementById('exp-fab-menu');
-  const open = fab && fab.classList.toggle('fab-open');
-  if (menu) menu.classList.toggle('fab-open', open);
+  const wrap = document.getElementById('exp-fab-wrap');
+  const overlay = document.getElementById('exp-fab-overlay');
+  if (!wrap) return;
+  const open = wrap.classList.toggle('open');
+  if (overlay) overlay.classList.toggle('active', open);
 }
 function closeFab() {
-  document.getElementById('exp-fab')?.classList.remove('fab-open');
-  document.getElementById('exp-fab-menu')?.classList.remove('fab-open');
+  const wrap = document.getElementById('exp-fab-wrap');
+  const overlay = document.getElementById('exp-fab-overlay');
+  if (wrap) wrap.classList.remove('open');
+  if (overlay) overlay.classList.remove('active');
 }
 function _updateExpFab() {
-  const fab = document.getElementById('exp-fab');
-  if (!fab) return;
+  const wrap = document.getElementById('exp-fab-wrap');
+  if (!wrap) return;
   const show = _activeModule === 'expenses' && _expPage === 'monthly';
-  fab.style.display = show ? 'flex' : 'none';
+  wrap.style.display = show ? 'flex' : 'none';
   if (!show) closeFab();
 }
 
@@ -4406,6 +4469,20 @@ function changeBudgetYear(delta) {
   renderBudgetAnnual();
 }
 
+function showConfirmModal(title, body, onConfirm, confirmLabel, confirmClass) {
+  const el = document.getElementById('confirm-modal');
+  document.getElementById('confirm-modal-title').textContent = title;
+  document.getElementById('confirm-modal-body').textContent = body;
+  const ok = document.getElementById('confirm-modal-ok');
+  ok.textContent = confirmLabel || 'Confirm';
+  ok.className = 'btn ' + (confirmClass || 'bd');
+  ok.onclick = () => { closeConfirmModal(); onConfirm(); };
+  el.classList.add('open');
+}
+function closeConfirmModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+}
+
 function copyPrevMonth() {
   _initBudgetYM();
   const prevYM = _ymPrev(_budgetYM);
@@ -4413,10 +4490,61 @@ function copyPrevMonth() {
   if (!Object.keys(prevData).length) {
     alert('No budget data found for ' + _ymToLabel(prevYM) + '.'); return;
   }
-  if (!confirm('Copy all values from ' + _ymToLabel(prevYM) + ' to ' + _ymToLabel(_budgetYM) + '?')) return;
-  state.budget.monthlyData[_budgetYM] = JSON.parse(JSON.stringify(prevData));
-  save();
-  renderBudgetMonthly();
+  closeBudgetFAB();
+  showConfirmModal(
+    '📋 Copy Previous Month',
+    'This will overwrite all planned amounts for ' + _ymToLabel(_budgetYM) + ' with values from ' + _ymToLabel(prevYM) + '. This cannot be undone.',
+    () => {
+      state.budget.monthlyData[_budgetYM] = JSON.parse(JSON.stringify(prevData));
+      save(); renderBudgetMonthly();
+    },
+    'Copy & Overwrite', 'bp'
+  );
+}
+
+function resetBudgetMonth() {
+  _initBudgetYM();
+  const ym = _budgetYM;
+  if ((state.budget.lockedMonths||{})[ym]) {
+    alert('This month is locked. Unlock it first before resetting.'); return;
+  }
+  closeBudgetFAB();
+  showConfirmModal(
+    '🔄 Reset Month to Defaults',
+    'All on/off overrides for ' + _ymToLabel(ym) + ' will be cleared. Every recurring item (savings, debt, subscriptions, sinking funds) will be restored to ON. Planned amounts are not affected.',
+    () => {
+      if (state.budget.monthlyActive) delete state.budget.monthlyActive[ym];
+      save(); renderBudgetMonthly();
+    },
+    'Reset', 'bd'
+  );
+}
+
+function toggleBudgetFAB() {
+  const wrap = document.getElementById('bm-fab-wrap');
+  const overlay = document.getElementById('bm-fab-overlay');
+  if (!wrap) return;
+  const isOpen = wrap.classList.toggle('open');
+  if (overlay) overlay.classList.toggle('active', isOpen);
+  if (!isOpen) {
+    const sub = document.getElementById('bm-fab-add-sub');
+    if (sub) sub.classList.remove('open');
+  }
+}
+
+function closeBudgetFAB() {
+  const wrap = document.getElementById('bm-fab-wrap');
+  const overlay = document.getElementById('bm-fab-overlay');
+  const sub = document.getElementById('bm-fab-add-sub');
+  if (wrap) wrap.classList.remove('open');
+  if (overlay) overlay.classList.remove('active');
+  if (sub) sub.classList.remove('open');
+}
+
+function toggleBudgetFabAddSub(e) {
+  e.stopPropagation();
+  const sub = document.getElementById('bm-fab-add-sub');
+  if (sub) sub.classList.toggle('open');
 }
 
 // Legacy subscription category key → new unified EXPENSE_CATS value
@@ -4739,16 +4867,16 @@ function renderBudgetMonthly() {
   const incRows = rows.filter(r=>r.section==='income');
   const savRows = rows.filter(r=>r.section==='savings');
   const expRows = rows.filter(r=>r.section==='expense');
-  const activeDebts = state.creditors.filter(c=>isDebtBudgetActive(c.id));
+  const activeDebts = state.creditors.filter(c=>isDebtBudgetActive(c.id,ym));
   const savFunds    = (state.savings.funds||[]).filter(f=>f.monthly>0);
   const sinkFunds   = savFunds.filter(f=>(f.type||'sinking')==='sinking');
   const nonSinkFunds= savFunds.filter(f=>(f.type||'sinking')!=='sinking');
-  const activeSubs  = (state.budget.subscriptions||[]).filter(s=>s.active!==false && isSubActive(s.id) && (!s.startDate || s.startDate<=ym));
+  const activeSubs  = (state.budget.subscriptions||[]).filter(s=>s.active!==false && isSubActive(s.id,ym) && (!s.startDate || s.startDate<=ym));
 
   const sinkBudgetRows = rows.filter(r=>r.section==='sinking');
 
   const _planFundTotal = (funds) => funds.reduce((s,f)=>{
-    if (!isSavingsPlanActive(f.id)) return s;
+    if (!isSavingsPlanActive(f.id,ym)) return s;
     const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
     return s+(inRange?(f.monthly||0):0);
   },0);
@@ -4763,7 +4891,10 @@ function renderBudgetMonthly() {
   const totalSavCustom = savRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSavInv    = totalSavCustom + _planFundTotal(nonSinkFunds);
   const linkedFunds    = (state.budget.sinkFundLinks||[]).map(id=>(state.savings.funds||[]).find(f=>f.id===id)).filter(Boolean);
-  const linkedFundPlan = linkedFunds.reduce((s,f)=>s+(isSavingsPlanActive(f.id)?r2(f.monthly||0):0),0);
+  const linkedFundPlan = linkedFunds.reduce((s,f)=>{
+    const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
+    return s+(isSavingsPlanActive(f.id,ym)&&inRange?r2(f.monthly||0):0);
+  },0);
   const totalSinkFund  = _planFundTotal(sinkFunds.filter(f=>!(state.budget.sinkFundLinks||[]).includes(f.id)))
     + linkedFundPlan + sinkBudgetRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSav       = totalSavInv + totalSinkFund;
@@ -4771,8 +4902,10 @@ function renderBudgetMonthly() {
   const totalExpCustom = expRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
   const totalSubExp    = activeSubs.reduce((s,sub)=>s+(sub.amount||0),0);
   const totalExp       = totalExpCustom + totalSubExp;
-  const remaining      = totalInc - totalSav - totalDebt;
-  const net            = totalInc - totalSav - totalExp - totalDebt;
+  const remForDebt     = totalInc - totalSavInv;
+  const remForExp      = totalInc - totalSavInv - totalDebt;
+  const remForSink     = totalInc - totalSavInv - totalDebt - totalExp;
+  const net            = totalInc - totalSavInv - totalDebt - totalExp - totalSinkFund;
 
   const C = 5; // total columns
 
@@ -4795,7 +4928,7 @@ function renderBudgetMonthly() {
   }
 
   function debtRow(c) {
-    const active=isDebtBudgetActive(c.id);
+    const active=isDebtBudgetActive(c.id,ym);
     const amt=getDebtScheduledPayment(c.id,ym);
     // actual: check paymentHistory (from checkbox) OR debt_payment expense entries
     const idx=_scheduleMonthIdx(ym);
@@ -4810,7 +4943,7 @@ function renderBudgetMonthly() {
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
-          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleDebtBudgetActive('${c.id}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
+          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleDebtBudgetActive('${c.id}','${ym}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
         </div>
       </td>
       ${_progCell(actual,amt,'expense')}
@@ -4818,7 +4951,7 @@ function renderBudgetMonthly() {
   }
 
   function savingsPlanRow(f) {
-    const active = isSavingsPlanActive(f.id);
+    const active = isSavingsPlanActive(f.id,ym);
     const amt = f.monthly || 0;
     // Check date range (same as annual view)
     const inRange = (!f.startDate || ym >= f.startDate) && (!f.targetDate || ym <= f.targetDate.slice(0,7));
@@ -4834,7 +4967,7 @@ function renderBudgetMonthly() {
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
-          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSavingsPlanActive('${f.id}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
+          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSavingsPlanActive('${f.id}','${ym}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
         </div>
       </td>
       ${_progCell(actual, active?amt:0, 'expense')}
@@ -4844,7 +4977,7 @@ function renderBudgetMonthly() {
   // Linked sinking fund row — always visible regardless of date range, has unlink button
   function linkedFundRow(f) {
     if (!f) return '';
-    const active = isSavingsPlanActive(f.id);
+    const active = isSavingsPlanActive(f.id,ym);
     const amt = f.monthly || 0;
     const key = `${ym}-${f.id}`;
     const h = (state.savings.history||{})[key] || {};
@@ -4860,7 +4993,7 @@ function renderBudgetMonthly() {
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active&&inRange?1:.4}">${fmt(amt)}</span>
-          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSavingsPlanActive('${f.id}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
+          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSavingsPlanActive('${f.id}','${ym}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
         </div>
       </td>
       ${_progCell(actual, active&&inRange?amt:0, 'expense')}
@@ -4868,7 +5001,7 @@ function renderBudgetMonthly() {
   }
 
   function subRow(sub) {
-    const active=isSubActive(sub.id);
+    const active=isSubActive(sub.id,ym);
     const amt=sub.amount||0;
     const acctN=sub.accountId?acctName(sub.accountId):'—';
     // actual: expense entries matching this subscription name/id
@@ -4880,7 +5013,7 @@ function renderBudgetMonthly() {
       <td class="nr" style="vertical-align:middle">
         <div style="display:flex;align-items:center;justify-content:flex-end;gap:.4rem">
           <span style="opacity:${active?1:.4}">${fmt(amt)}</span>
-          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSubBudgetActive('${sub.id}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
+          <button class="btn bxs ${active?'bs':'bg'}" onclick="toggleSubBudgetActive('${sub.id}','${ym}')" style="min-width:48px">${active?'✓ On':'✗ Off'}</button>
         </div>
       </td>
       ${_progCell(actual,amt,'expense')}
@@ -4941,19 +5074,29 @@ function renderBudgetMonthly() {
         <td class="nr" id="bmt-sav"><strong>${fmt(totalSavInv)}</strong></td>
         <td class="bactual-cell">${_progCell(actSav,totalSavInv,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
 
+      <tr class="calc-row">
+        <td colspan="3">💳 <strong>Remaining for Debt Repayment</strong>
+          <span style="font-size:.75rem;color:var(--g500);margin-left:.5rem">= Income − Savings</span></td>
+        <td class="nr ${remForDebt>=0?'pos':'neg'}" id="bmt-remdebt"><strong>${fmt(remForDebt)}</strong></td>
+        <td class="bactual-cell" style="font-size:.8rem;color:var(--g500)">
+          ${(actInc||actSav) ? (()=>{ const n=actInc-actSav; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span>`; })() : ''}
+        </td></tr>
+
       ${state.creditors.length?`
       <tr class="sect-row"><td colspan="${C}">💳 Debt Payments</td></tr>
       ${state.creditors.filter(c=>!state.schedule.length||getDebtScheduledPayment(c.id,ym)>0).map(debtRow).join('')}
       ${state.schedule.length&&state.creditors.every(c=>getDebtScheduledPayment(c.id,ym)===0)?`<tr><td colspan="${C}" style="color:var(--g400);font-size:.8rem;padding:.6rem 1rem">All debts paid off this month 🎉</td></tr>`:''}
-      <tr class="total-row"><td colspan="2"><strong>Total Debt (Active)</strong></td><td></td>
+      <tr class="total-row"><td colspan="2"><strong>Total Debt Repayment</strong></td><td></td>
         <td class="nr" id="bmt-debt"><strong>${fmt(totalDebt)}</strong></td>
         <td class="bactual-cell" id="bmt-debt-act">${_progCell(actDebt,totalDebt,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>`:''}
 
       <tr class="calc-row">
-        <td colspan="3">💵 <strong>Remaining for Expenses</strong>
-          <span style="font-size:.75rem;color:var(--g500);margin-left:.5rem">= Income − Savings − Debt</span></td>
-        <td class="nr ${remaining>=0?'pos':'neg'}" id="bmt-rem"><strong>${fmt(remaining)}</strong></td>
-        <td></td></tr>
+        <td colspan="3">🔴 <strong>Remaining for Expenses</strong>
+          <span style="font-size:.75rem;color:var(--g500);margin-left:.5rem">= Income − Savings − Debt Repayment</span></td>
+        <td class="nr ${remForExp>=0?'pos':'neg'}" id="bmt-rem"><strong>${fmt(remForExp)}</strong></td>
+        <td class="bactual-cell" style="font-size:.8rem;color:var(--g500)">
+          ${(actInc||actSav||actDebt) ? (()=>{ const n=actInc-actSav-actDebt; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span>`; })() : ''}
+        </td></tr>
 
       <tr class="sect-row"><td colspan="${C}">🔴 Expenses</td></tr>
       ${expRows.length?expRows.map(r=>customRow(r,'expense')).join(''):noRows}
@@ -4970,6 +5113,14 @@ function renderBudgetMonthly() {
         <td class="nr" id="bmt-exp"><strong>${fmt(totalExp)}</strong></td>
         <td class="bactual-cell">${_progCell(actExp,totalExp,'expense').replace(/^<td[^>]*>/,'').replace(/<\/td>$/,'')}</td></tr>
 
+      <tr class="calc-row">
+        <td colspan="3">🏦 <strong>Remaining for Sinking Fund</strong>
+          <span style="font-size:.75rem;color:var(--g500);margin-left:.5rem">= Income − Savings − Debt Repayment − Expenses</span></td>
+        <td class="nr ${remForSink>=0?'pos':'neg'}" id="bmt-remsink"><strong>${fmt(remForSink)}</strong></td>
+        <td class="bactual-cell" style="font-size:.8rem;color:var(--g500)">
+          ${(actInc||actSav||actDebt||actExp) ? (()=>{ const n=actInc-actSav-actDebt-actExp; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span>`; })() : ''}
+        </td></tr>
+
       <tr class="sect-row"><td colspan="${C}">🏦 Sinking Funds</td></tr>
       ${sinkBudgetRows.map(r=>customRow(r,'expense')).join('')}
       ${(state.budget.sinkFundLinks||[]).map(id=>(state.savings.funds||[]).find(f=>f.id===id)).map(linkedFundRow).join('')}
@@ -4984,10 +5135,10 @@ function renderBudgetMonthly() {
 
       <tr class="net-row">
         <td colspan="3"><strong>💰 Net Cash Flow</strong>
-          <span style="font-size:.75rem;margin-left:.5rem;opacity:.7">= Income − Savings − Sinking Funds − Debt − Expenses</span></td>
+          <span style="font-size:.75rem;margin-left:.5rem;opacity:.7">= Income − Savings − Debt Repayment − Expenses − Sinking Fund</span></td>
         <td class="nr ${net>=0?'pos':'neg'}" id="bmt-net"><strong>${net>=0?'+':''}${fmt(net)}</strong></td>
         <td class="bactual-cell" style="font-size:.8rem;color:var(--g500)" id="bmt-net-act">
-          ${(actInc||actSavAll||actDebt||actExp) ? (() => { const n=actInc-actSavAll-actDebt-actExp; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span><div style="font-size:.68rem;color:var(--g400)">actual flow</div>`; })() : ''}
+          ${(actInc||actSavAll||actDebt||actExp||actSinkFund) ? (() => { const n=actInc-actSavAll-actDebt-actExp-actSinkFund; return `<span style="color:${n>=0?'var(--green2)':'var(--red2)'};font-weight:700">${n>=0?'+':''}${fmt(n)}</span><div style="font-size:.68rem;color:var(--g400)">actual flow</div>`; })() : ''}
         </td></tr>
     </tbody>
   </table>`;
@@ -5005,23 +5156,30 @@ function _refreshBudgetMonthlyTotals() {
   const sinkFunds=savFunds.filter(f=>(f.type||'sinking')==='sinking');
   const nonSinkFunds=savFunds.filter(f=>(f.type||'sinking')!=='sinking');
   const _planFundTotal=funds=>funds.reduce((s,f)=>{
-    if(!isSavingsPlanActive(f.id)) return s;
+    if(!isSavingsPlanActive(f.id,ym)) return s;
     const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
     return s+(inRange?(f.monthly||0):0);
   },0);
   const sinkBudgetRows=rows.filter(r=>r.section==='sinking');
   const totalSavInv=totalSavCustom+_planFundTotal(nonSinkFunds);
-  const totalSinkFund=_planFundTotal(sinkFunds)+sinkBudgetRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
-  const totalSav=totalSavInv+totalSinkFund;
-  const totalDebt=state.creditors.filter(c=>isDebtBudgetActive(c.id)).reduce((s,c)=>s+getDebtScheduledPayment(c.id,ym),0);
+  const linkedFunds=(state.budget.sinkFundLinks||[]).map(id=>(state.savings.funds||[]).find(f=>f.id===id)).filter(Boolean);
+  const linkedFundPlan=linkedFunds.reduce((s,f)=>{
+    const inRange=(!f.startDate||ym>=f.startDate)&&(!f.targetDate||ym<=f.targetDate.slice(0,7));
+    return s+(isSavingsPlanActive(f.id,ym)&&inRange?r2(f.monthly||0):0);
+  },0);
+  const totalSinkFund=_planFundTotal(sinkFunds.filter(f=>!(state.budget.sinkFundLinks||[]).includes(f.id)))+linkedFundPlan+sinkBudgetRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
+  const totalDebt=state.creditors.filter(c=>isDebtBudgetActive(c.id,ym)).reduce((s,c)=>s+getDebtScheduledPayment(c.id,ym),0);
   const totalExpCustom=expRows.reduce((s,r)=>s+getBVal(r.id,ym),0);
-  const totalSubExp=(state.budget.subscriptions||[]).filter(s=>s.active!==false&&isSubActive(s.id)&&(!s.startDate||s.startDate<=ym)).reduce((s,sub)=>s+(sub.amount||0),0);
+  const totalSubExp=(state.budget.subscriptions||[]).filter(s=>s.active!==false&&isSubActive(s.id,ym)&&(!s.startDate||s.startDate<=ym)).reduce((s,sub)=>s+(sub.amount||0),0);
   const totalExp=totalExpCustom+totalSubExp;
-  const remaining=totalInc-totalSav-totalDebt;
-  const net=totalInc-totalSav-totalExp-totalDebt;
+  const remForDebt=totalInc-totalSavInv;
+  const remForExp=totalInc-totalSavInv-totalDebt;
+  const remForSink=totalInc-totalSavInv-totalDebt-totalExp;
+  const net=totalInc-totalSavInv-totalDebt-totalExp-totalSinkFund;
   const upd=(id,val,pos)=>{ const el=document.getElementById(id); if(!el) return; el.innerHTML=`<strong>${pos&&val>=0?'+':''}${fmt(val)}</strong>`; el.className='nr '+(val>=0?'pos':'neg'); };
   upd('bmt-inc',totalInc,false); upd('bmt-sav',totalSavInv,false); upd('bmt-sink',totalSinkFund,false);
-  upd('bmt-debt',totalDebt,false); upd('bmt-rem',remaining,false); upd('bmt-exp',totalExp,false); upd('bmt-net',net,true);
+  upd('bmt-debt',totalDebt,false); upd('bmt-remdebt',remForDebt,false); upd('bmt-rem',remForExp,false);
+  upd('bmt-remsink',remForSink,false); upd('bmt-exp',totalExp,false); upd('bmt-net',net,true);
 }
 
 function editBudgetRow(rowId) {
@@ -6447,7 +6605,15 @@ function _renderNwLiabs() {
 // ============================================================
 //  BUDGET — DEBT & SINKING FUND ACTIVE TOGGLES + LOCK
 // ============================================================
-function isDebtBudgetActive(cid) { return (state.budget.debtActive||{})[cid] !== false; }
+function isDebtBudgetActive(cid, ym) {
+  if (ym) {
+    const locked = (state.budget.lockedMonths||{})[ym];
+    if (locked && typeof locked === 'object') return locked.debt?.[cid] !== false;
+    const ma = (state.budget.monthlyActive||{})[ym];
+    if (ma?.debt && cid in ma.debt) return ma.debt[cid] !== false;
+  }
+  return (state.budget.debtActive||{})[cid] !== false;
+}
 function isSfBudgetActive(fid)   { return (state.budget.sfActive||{})[fid]   !== false; }
 
 // Returns the month index (0-based) for a YYYY-MM string relative to schedule start
@@ -6504,9 +6670,18 @@ function getDebtRemainingBalance(creditorId, ym) {
   // No entries found at all — debt hasn't started, return original balance
   return c?(c.balance||0):0;
 }
-function toggleDebtBudgetActive(cid) {
-  if (!state.budget.debtActive) state.budget.debtActive = {};
-  state.budget.debtActive[cid] = !isDebtBudgetActive(cid);
+function toggleDebtBudgetActive(cid, ym) {
+  if (ym) {
+    if ((state.budget.lockedMonths||{})[ym]) return;
+    if (!state.budget.monthlyActive) state.budget.monthlyActive = {};
+    if (!state.budget.monthlyActive[ym]) state.budget.monthlyActive[ym] = {};
+    const ma = state.budget.monthlyActive[ym];
+    if (!ma.debt) ma.debt = {};
+    ma.debt[cid] = !isDebtBudgetActive(cid, ym);
+  } else {
+    if (!state.budget.debtActive) state.budget.debtActive = {};
+    state.budget.debtActive[cid] = !isDebtBudgetActive(cid);
+  }
   save(); renderBudgetMonthly(); renderBudgetAnnual();
 }
 function toggleSfBudgetActive(fid) {
@@ -6514,16 +6689,50 @@ function toggleSfBudgetActive(fid) {
   state.budget.sfActive[fid] = !isSfBudgetActive(fid);
   save(); renderBudgetMonthly(); renderBudgetAnnual();
 }
-function isSavingsPlanActive(fid) { return (state.budget.savingsPlanActive||{})[fid] !== false; }
-function toggleSavingsPlanActive(fid) {
-  if (!state.budget.savingsPlanActive) state.budget.savingsPlanActive = {};
-  state.budget.savingsPlanActive[fid] = !isSavingsPlanActive(fid);
+function isSavingsPlanActive(fid, ym) {
+  if (ym) {
+    const locked = (state.budget.lockedMonths||{})[ym];
+    if (locked && typeof locked === 'object') return locked.sav?.[fid] !== false;
+    const ma = (state.budget.monthlyActive||{})[ym];
+    if (ma?.sav && fid in ma.sav) return ma.sav[fid] !== false;
+  }
+  return (state.budget.savingsPlanActive||{})[fid] !== false;
+}
+function toggleSavingsPlanActive(fid, ym) {
+  if (ym) {
+    if ((state.budget.lockedMonths||{})[ym]) return;
+    if (!state.budget.monthlyActive) state.budget.monthlyActive = {};
+    if (!state.budget.monthlyActive[ym]) state.budget.monthlyActive[ym] = {};
+    const ma = state.budget.monthlyActive[ym];
+    if (!ma.sav) ma.sav = {};
+    ma.sav[fid] = !isSavingsPlanActive(fid, ym);
+  } else {
+    if (!state.budget.savingsPlanActive) state.budget.savingsPlanActive = {};
+    state.budget.savingsPlanActive[fid] = !isSavingsPlanActive(fid);
+  }
   save(); renderBudgetMonthly(); renderBudgetAnnual();
 }
-function isSubActive(sid) { return (state.budget.subActive||{})[sid] !== false; }
-function toggleSubBudgetActive(sid) {
-  if (!state.budget.subActive) state.budget.subActive = {};
-  state.budget.subActive[sid] = !isSubActive(sid);
+function isSubActive(sid, ym) {
+  if (ym) {
+    const locked = (state.budget.lockedMonths||{})[ym];
+    if (locked && typeof locked === 'object') return locked.sub?.[sid] !== false;
+    const ma = (state.budget.monthlyActive||{})[ym];
+    if (ma?.sub && sid in ma.sub) return ma.sub[sid] !== false;
+  }
+  return (state.budget.subActive||{})[sid] !== false;
+}
+function toggleSubBudgetActive(sid, ym) {
+  if (ym) {
+    if ((state.budget.lockedMonths||{})[ym]) return;
+    if (!state.budget.monthlyActive) state.budget.monthlyActive = {};
+    if (!state.budget.monthlyActive[ym]) state.budget.monthlyActive[ym] = {};
+    const ma = state.budget.monthlyActive[ym];
+    if (!ma.sub) ma.sub = {};
+    ma.sub[sid] = !isSubActive(sid, ym);
+  } else {
+    if (!state.budget.subActive) state.budget.subActive = {};
+    state.budget.subActive[sid] = !isSubActive(sid);
+  }
   save(); renderBudgetMonthly(); renderBudgetAnnual();
 }
 function _allSinkingFunds() {
@@ -6535,8 +6744,13 @@ function toggleBudgetLock(ym) {
   if (!state.budget.lockedMonths) state.budget.lockedMonths = {};
   const locked = !!state.budget.lockedMonths[ym];
   if (!locked) {
-    if (!confirm('Lock this month? Amounts will be frozen.')) return;
-    state.budget.lockedMonths[ym] = true;
+    if (!confirm('Lock this month? Amounts and row states will be frozen.')) return;
+    // Snapshot effective active state for every row at this moment
+    const snap = { sub:{}, debt:{}, sav:{} };
+    (state.budget.subscriptions||[]).forEach(s => { snap.sub[s.id]  = isSubActive(s.id, ym); });
+    (state.creditors||[]).forEach(c            => { snap.debt[c.id] = isDebtBudgetActive(c.id, ym); });
+    ((state.savings||{}).funds||[]).forEach(f  => { snap.sav[f.id]  = isSavingsPlanActive(f.id, ym); });
+    state.budget.lockedMonths[ym] = snap;
   } else {
     if (!confirm('Unlock this month? Amounts will become editable again.')) return;
     delete state.budget.lockedMonths[ym];
@@ -7118,7 +7332,8 @@ function openExpModal(id, presetType) {
   document.getElementById('exp-notes').value = e?(e.notes||''):'';
   _setExpType(etype);
   const sel = document.getElementById('exp-row-id');
-  if (e && e.rowId) sel.value = e.rowId;
+  if (e && e.subId) sel.value = 'sub:'+e.subId;
+  else if (e && e.rowId) sel.value = e.rowId;
   // Restore fund/creditor selection when editing
   if (e && e.fundId) { const fs=document.getElementById('exp-fund-id'); if(fs) fs.value=e.fundId; }
   if (e && e.creditorId) { const cs=document.getElementById('exp-creditor-id'); if(cs) cs.value=e.creditorId; }
@@ -7179,8 +7394,11 @@ function saveExp() {
     amount = 0; // not used for recompute
   }
 
+  const _rowSel = (type==='savings_payment'||type==='debt_payment') ? '' : (document.getElementById('exp-row-id').value||'');
+  const _isSubLink = _rowSel.startsWith('sub:');
   const obj={id,name,date,ym,amount,type,
-    rowId: (type==='savings_payment'||type==='debt_payment') ? null : (document.getElementById('exp-row-id').value||null),
+    rowId: _isSubLink ? null : (_rowSel||null),
+    subId: _isSubLink ? _rowSel.slice(4) : null,
     category: type==='adjustment' ? null : (document.getElementById('exp-cat-id')?.value||null),
     fundId, creditorId, accountId,
     adjPositive, adjNewBalance, adjOldBalance,
